@@ -1,0 +1,7 @@
+## Interface: 70000
+## Title: Pigments
+## Author: TheGenomeWhisperer
+## Version: 0.0.1
+## Notes: Tracks Pigment Data from milling.
+
+Pigment_Count.lua
