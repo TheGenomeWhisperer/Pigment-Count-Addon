@@ -1,6 +1,5 @@
 -- Author: TheGenomeWhisperer
 
-
 SLASH_MASSMILL1 = '/milling';
 
 -- LEGION HERBS
@@ -10,16 +9,86 @@ local Fjarnskaggl = 0;
 local Foxflower = 0;
 local StarlightRose = 0;
 local Yseralline = 0;
-local allLegionHerbs = {"Aethril","Dreamleaf","Fjarnskaggl","Foxflower","Starlight Rose","Yseralline Seed"};
+local allLegionHerbIDs = {"124101","124102","124104","124103","124105"};
+local allLegionHerbLinks = {};
 
 -- Milling Byproducts
-local roseate = 0;
-local sallow = 0;
-local gemChip = 0;
-local nightmarePod = 0;
-local Yseed = 0;
-local allByproducts = {"roseate", "sallow", "Gem Chip", "Nightmare Pod", "Yseralline Seed"};
+local allRoseate = 0;
+local allSallow = 0;
+local allGemChip = 0;
+local allNightmarePod = 0;
+local allYseed = 0;
 local allByproductIDs = {"129032","129034","129100","136926","128304"};
+local allByproductLinks = {};
+
+-- 2D table of all the data
+local resultsTable = {};
+
+-- Get Item Link by ID to use in a table
+function SetLegionHerbLinks(array)
+    for x,ID in ipairs(array) do
+        local _,link = GetItemInfo(ID);
+        allLegionHerbLinks[x] = link;
+    end
+end
+
+-- Get Item Link by ID to use in a table
+function SetLegionMillingProductLinks(array)
+    for x,ID in ipairs(array) do
+        local _,link = GetItemInfo(ID);
+        allByproductLinks[x] = link;
+    end
+end
+
+-- Localizing the names of the Herbs
+SetLegionHerbLinks(allLegionHerbIDs);
+SetLegionMillingProductLinks(allByproductIDs);
+
+-- Creates 2D array of all the data to easily be added to.
+function setCollectedData()
+    local count1 = 1;
+    local count2 = 1;
+    for row = 1, 6 do
+        resultsTable[row] = {};
+        for col = 1, 6 do
+            if col == 1 and row ~= 1 then
+                resultsTable[row][col] = allLegionHerbLinks[count1];
+                count1 = count1 + 1;
+            elseif row == 1 and col ~= 1 then
+                resultsTable[row][col] = allByproductLinks[count2];
+                count2 = count2 + 1;
+            else
+                resultsTable[row][col] = 0;
+            end
+        end
+    end
+    resultsTable[1][1] = "_"; -- To keep it clean looking.
+end
+
+-- -- Initializing the table
+setCollectedData();
+
+-- Byprodcut sub-groups
+-- Aethril
+local aethrilRoseate = 0;
+local aethrilSallow = 0;
+local aethrilYSeed = 0;
+-- Dreamleaf
+local dreamleafRoseate = 0;
+local dreamSallow = 0;
+local dreamYSeed = 0;
+--Fjarnskaggl
+local FjarnRoseate = 0;
+local FjarnSallow = 0;
+local FjarnYSeed = 0;
+--Foxflower
+local foxRoseate = 0;
+local foxSallow = 0;
+local foxYSeed = 0;
+--Starlight Rose
+local starRoseate = 0;
+local starSallow = 0;
+local starYSeed = 0;
 
 -- itemLoot Tracking
 local roseateLoot = 0;
@@ -39,6 +108,11 @@ local sallowLooted = false;
 local chipLooted = false;
 local podLooted = false;
 local seedLooted = false;
+local aethrilMilled = false;
+local dreamMilled = false;
+local fjarnMilled = false;
+local foxMilled = false;
+local starlightMilled = false;
 
 -- Frames
 local millEvent = CreateFrame("Frame");
@@ -46,28 +120,85 @@ local professionTracking = CreateFrame("Frame");
 local itemCountTracking = CreateFrame("Frame")
 
 function countPigments()
+    if GetTime() < time then
+        -- Roseate Loot
         if roseLooted then
-            roseate = roseate + (GetItemCount(129032, false) - roseateLoot);
+            local newCount = GetItemCount(129032, false)
+            if aethrilMilled then
+                aethrilRoseate = aethrilRoseate + (newCount - roseateLoot);
+                aethrilMilled = false; 
+            elseif dreamMilled then
+                dreamleafRoseate = dreamleafRoseate + (newCount - roseateLoot);
+                dreamMilled = false;
+            elseif fjarnMilled then
+                FjarnRoseate = FjarnRoseate + (newCount - roseateLoot);
+                fjarnMilled = false;
+            elseif foxMilled then
+                foxRoseate = foxRoseate + (newCount - roseateLoot);
+                foxMilled = false;
+            elseif starlightMilled then
+                starRoseate = starRoseate + (newCount - roseateLoot);
+                starlightMilled = false;
+            end
             roseLooted = false;
-            print(roseate);
+            print(dreamleafRoseate); -- To Be Deleted
+            -- Sallow pigment Loot tracking
         elseif sallowLooted then
-            sallow = sallow + (GetItemCount(129034, false) - sallowLoot);
+            local newCount2 = GetItemCount(129034, false)
+            if aethrilMilled then
+                aethrilSallow = aethrilSallow + (newCount2 - sallowLoot);
+                aethrilMilled = false; 
+            elseif dreamMilled then
+                dreamSallow = dreamSallow + (newCount2 - sallowLoot);
+                dreamMilled = false;
+            elseif fjarnMilled then
+                FjarnSallow = FjarnSallow + (newCount2 - sallowLoot);
+                fjarnMilled = false;
+            elseif foxMilled then
+                foxSallow = foxSallow + (newCount2 - sallowLoot);
+                foxMilled = false;
+            elseif starlightMilled then
+                starSallow = starSallow + (newCount2 - sallowLoot);
+                starlightMilled = false;
+            end
             sallowLooted = false;
-            print(sallow);
-        elseif chipLooted then
-            gemChip = gemChip + (GetItemCount(129100, false) - gemChipLoot);
-            chipLooted = false;
-            print(gemChip);
-        elseif podLooted then
-            nightmarePod = nightmarePod + (GetItemCount(136926, false) - nightmarePodLoot);
-            podLooted = false;
-            print(nightmarePod);
+        -- Yseralline Seed Loot tracking
         elseif seedLooted then
-            Yseed = Yseed + (GetItemCount(128304, false) - YseedLoot);
+            local newCount3 = GetItemCount(128304, false)
+            if aethrilMilled then
+                aethrilYSeed = aethrilYSeed + (newCount3 - YseedLoot);
+                aethrilMilled = false; 
+            elseif dreamMilled then
+                dreamYSeed = dreamYSeed + (newCount3 - YseedLoot);
+                dreamMilled = false;
+            elseif fjarnMilled then
+                FjarnYSeed = FjarnYSeed + (newCount3 - YseedLoot);
+                fjarnMilled = false;
+            elseif foxMilled then
+                foxYSeed = foxYSeed + (newCount3 - YseedLoot);
+                foxMilled = false;
+            elseif starlightMilled then
+                starYSeed = starYSeed + (newCount3 - YseedLoot);
+                starlightMilled = false;
+            end
             seedLooted = false;
-            print(Yseed);
+        -- Gem Chip loot tracking
+        elseif chipLooted then -- Only Aethril can produce gemChips, so no need to check all.
+            allGemChip = allGemChip + (GetItemCount(129100, false) - gemChipLoot);
+            chipLooted = false;
+            aethrilMilled = false;
+            print(allGemChip);
+        -- Nightmare pod loot tracking
+        elseif podLooted then -- only Dreamleaf can produce pods.
+            allNightmarePod = allNightmarePod + (GetItemCount(136926, false) - nightmarePodLoot);
+            podLooted = false;
+            dreamMilled = false;
+            print(allNightmarePod);
         end
-        print("test");
+    else
+        pigmentCountEnabled = false;
+        itemCountTracking:UnregisterEvent("BAG_UPDATE");
+    end
 end
 
 function detectLooting(self, event, msg)
@@ -115,53 +246,58 @@ function millHerb(self, event, unitID, spell, rank, lineID, spellID)
         gemChipLoot = GetItemCount(129100, false);
         nightmarePodLoot = GetItemCount(136926, false);
         YseedLoot = GetItemCount(128304, false);
-        -- Regulation
+        if spellID == 209658 then
+            aethrilMilled = true;
+            Aethril = Aethril + 20;
+        elseif spellID == 209659 then
+            dreamMilled = true;
+            Dreamleaf = Dreamleaf + 20;
+        elseif spellID == 209660 then
+            fjarnMilled = true;
+            Fjarnskaggl = Fjarnskaggl + 20;
+        elseif spellID == 209661 then
+            foxMilled = true;
+            Foxflower = Foxflower + 20;
+        elseif spellID == 209662 then
+            starlightMilled = true;
+            StarlightRose = StarlightRose + 20;
+        end
+        -- Regulation and tracking of loot. No need to do it unnecessarily at other times.
         IsEnabled = true;
         professionTracking:RegisterEvent("CHAT_MSG_LOOT");
         professionTracking:SetScript("OnEvent",detectLooting);
     end
 end
 
--- Tracking Frame for events
+-- Tracking Frame for milling
 function setTrackingMilling()
     millEvent:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED");
     millEvent:SetScript("OnEvent", millHerb);
-    professionTracking:RegisterEvent("CHAT_MSG_LOOT");
-    professionTracking:SetScript("OnEvent",detectLooting);
 end
 
 -- Defualt on when player logs in or user reloads UI
 setTrackingMilling();
 
 
--- , _, _, sourceName ,_,_,_,_,_,_, spellID, ...
 -- print("TESTING MILLING ADDON");
 -- -- Results of all -- Establishing grid.\
--- -- function setCollectedData()
--- --     local count1 = 1;
--- --     local count2 = 1;
--- --     local totalTally = {};
--- --     for i = 1, 6 do
--- --         totalTally[i] = {};
--- --         for j = 1, 4 do
--- --             if j == 1 and i ~= 1 then
--- --                 totalTally[i][j] = allLegionHerbs[count1];
--- --                 count1 = count1 + 1;
--- --             elseif i == 1 and j ~= 1 then
--- --                 totalTally[i][j] = allByproducts[count2];
--- --                 count2 = count2 + 1;
--- --             else
--- --                 totalTally[i][j] = 0;
--- --             end
--- --         end
--- --     end
--- --     totalTally[0][0] = "_"; -- To keep it clean looking.
--- -- end
+
 
 
 SlashCmdList["MASSMILL"] = function(input)
-    print("test");
-
+    print("\n------------------------------------------\n---          LEGION MILLING          ---\n----                 TOTALS               ----\n------------------------------------------");
+    print("\nAETHRIL: " .. Aethril);
+    -- result = result + "\nDREAMLEAF: " .. Dreamleaf .. "";
+    -- result = result + "\nFJARNSKAGGL: " .. Fjarnskaggl .. "";
+    -- result = result + "\nFOXFLOWER: " .. Foxflower .. "";
+    -- result = result + "\nSTARLIGHT ROSE: " .. StarlightRose .. "";
+    for i = 1,#resultsTable do
+        for j = 1,#resultsTable[1] do
+            print(resultsTable[i][j] .. " , ");
+        end
+    end
 
 
 end
+
+-- Still need to include Nightmare Pod tracking.
