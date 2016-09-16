@@ -1,0 +1,8 @@
+## Interface: 70000
+## Title: Pigment Count
+## Author: TheGenomeWhisperer
+## Version: 1.0.0
+## Notes: Tracks Pigment Data from milling (and all other byproducts, like in Legion)
+## SavedVariables: resultsTable_Save
+
+Pigment_Count.lua
