@@ -8,11 +8,14 @@ resultsTable_Save = {};
 
 -- LEGION HERBS
 local allLegionHerbIDs = {"124101","124102","124104","124103","124105","124106","136926"};
-local allLegionHerbNames = {};
+local allLegionHerbNames = {"|cffffffff|Hitem:124101::::::::110:253::::::|h[Aethril]|h|r","|cffffffff|Hitem:124102::::::::110:253::::::|h[Dreamleaf]|h|r","|cffffffff|Hitem:124104::::::::110:253::::::|h[Fjarnskaggl]|h|r",
+                            "|cffffffff|Hitem:124103::::::::110:253::::::|h[Foxflower]|h|r","|cffffffff|Hitem:124105::::::::110:253::::::|h[Starlight Rose]|h|r","|cff1eff00|Hitem:124106::::::::110:253::::::|h[Felwort]|h|r",
+                            "|cffffffff|Hitem:136926::::::::110:253::::::|h[Nightmare Pod]|h|r"};
 
 -- Milling Byproducts
 local allByproductIDs = {"129032","129034","128304","129100","136926"};
-local allByproductNames = {};
+local allByproductNames = {"|cffffffff|Hitem:129032::::::::110:253::::::|h[Roseate Pigment]|h|r","|cffffffff|Hitem:129034::::::::110:253::::::|h[Sallow Pigment]|h|r",
+                           "|cffffffff|Hitem:128304::::::::110:253::::::|h[Yseralline Seed]|h|r","|cffffffff|Hitem:129100::::::::110:253::::::|h[Gem Chip]|h|r","|cffffffff|Hitem:136926::::::::110:253::::::|h[Nightmare Pod]|h|r"};
 
 -- itemLoot Tracking
 local roseateLoot = 0;
@@ -80,8 +83,8 @@ end
 -- Creates 2D array of all the data to easily be added to.
 function setCollectedDataFromMilling()
     -- Localizing the names of the Herbs
-    SetLegionHerbNames(allLegionHerbIDs);
-    SetLegionMillingProductNames(allByproductIDs);
+    -- SetLegionHerbNames(allLegionHerbIDs);
+    -- SetLegionMillingProductNames(allByproductIDs);
     local count1 = 1;
     local count2 = 1;
     for row = 1, #allLegionHerbIDs + 1 do
@@ -365,3 +368,6 @@ SlashCmdList["MASSMILL"] = function(input)
         print("Please type /milling help for info.");
     end
 end
+
+
+-- /script for i=1,#resultsTable_Save do for j=1,#resultsTable_Save[1] do print(resultsTable_Save[i][j]) end end 
